@@ -20,29 +20,27 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <header className="py-8">
-          <nav className="container flex justify-between">
-            <ul className="flex space-x-6">
-              <li>
-                <Link href="/">Home</Link>
-              </li>
-              <li>
-                <Link href="/movies/popular">Movies</Link>
-              </li>
-            </ul>
-            <ThemeToggle />
-          </nav>
-        </header>
-        <main>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-          </ThemeProvider>
-        </main>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <header className="py-8">
+            <nav className="container flex justify-between">
+              <ul className="flex space-x-6">
+                <li>
+                  <Link href="/">Home</Link>
+                </li>
+                <li>
+                  <Link href="/movies/popular">Movies</Link>
+                </li>
+              </ul>
+              <ThemeToggle />
+            </nav>
+          </header>
+          <main>{children}</main>
+        </ThemeProvider>
       </body>
     </html>
   );

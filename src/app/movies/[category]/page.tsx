@@ -39,7 +39,7 @@ const Page = async ({ params, searchParams }: PageProps) => {
 
   const data: Movie[] = await getMovies();
   return (
-    <div className="container">
+    <div className="container space-y-6 ">
       <Pagination className="w-full flex justify-end ">
         <PaginationContent className="space-x-7">
           <PaginationItem>
@@ -58,10 +58,13 @@ const Page = async ({ params, searchParams }: PageProps) => {
         </PaginationContent>
       </Pagination>
 
-      <div className=" grid sm:grid-cols-3 gap-4">
+      <div className=" grid sm:grid-cols-3 gap-4 ">
         {data.map((movie) => (
-          <Card key={movie.id} className="overflow-hidden space-y-6">
-            <CardContent className="px-0">
+          <Card
+            key={movie.id}
+            className="overflow-hidden space-y-6 pb-4 lg:pb-10"
+          >
+            <CardContent className="p-0">
               <Image
                 className="w-full object-cover "
                 src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
@@ -71,9 +74,9 @@ const Page = async ({ params, searchParams }: PageProps) => {
               />
             </CardContent>
 
-            <CardTitle className="text-3xl">{movie.title}</CardTitle>
+            <CardTitle className="text-3xl px-4">{movie.title}</CardTitle>
 
-            <CardDescription className="h-20 text-pretty text-ellipsis overflow-hidden">
+            <CardDescription className="px-4  h-20 text-pretty text-ellipsis overflow-hidden">
               {movie.overview}
             </CardDescription>
           </Card>
