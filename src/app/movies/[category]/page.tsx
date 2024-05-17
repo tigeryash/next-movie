@@ -1,18 +1,15 @@
 import { Movie } from "@/lib/types";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardTitle,
-} from "@/components/ui/card";
-import Image from "next/image";
-import {
   Pagination,
   PaginationContent,
   PaginationItem,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import Search from "../search";
+import Movies from "./movies";
+import { Suspense } from "react";
+import Skeleton from "./skeleton";
 
 const API_KEY = process.env.TMDB_API_KEY;
 
@@ -22,17 +19,19 @@ type PageProps = {
   };
   searchParams: {
     page?: string;
+    query?: string;
   };
 };
 
 const Page = async ({ params, searchParams }: PageProps) => {
   const page =
     typeof searchParams.page === "string" ? Number(searchParams.page) : 1;
+  const query = searchParams.query || "";
+  const searchResult = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&language=en-US&query=${query}&page=${page}`;
+  const categoryResult = `https://api.themoviedb.org/3/movie/${params.category}?api_key=${API_KEY}&language=en-US&page=${page}`;
 
   const getMovies = async () => {
-    const response = await fetch(
-      `https://api.themoviedb.org/3/movie/${params.category}?api_key=${API_KEY}&language=en-US&page=${page}&limit=10`
-    );
+    const response = await fetch(query ? searchResult : categoryResult);
     const data = await response.json();
     return data.results;
   };
@@ -40,48 +39,44 @@ const Page = async ({ params, searchParams }: PageProps) => {
   const data: Movie[] = await getMovies();
   return (
     <div className="container space-y-6 ">
-      <Pagination className="w-full flex justify-end ">
-        <PaginationContent className="space-x-7">
-          <PaginationItem>
-            <PaginationPrevious
-              className={page === 1 ? "hidden" : ""}
-              href={`${params.category}?page=${page > 1 ? page - 1 : 1}`}
-            >
-              Previous
-            </PaginationPrevious>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext href={`${params.category}?page=${page + 1}`}>
-              Next
-            </PaginationNext>
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+      <div className="flex justify-around items-center">
+        <h1 className="w-1/3">Movies</h1>
 
-      <div className=" grid sm:grid-cols-3 gap-4 ">
-        {data.map((movie) => (
-          <Card
-            key={movie.id}
-            className="overflow-hidden space-y-6 pb-4 lg:pb-10"
-          >
-            <CardContent className="p-0">
-              <Image
-                className="w-full object-cover "
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                width={500}
-                height={750}
-                alt={movie.title}
-              />
-            </CardContent>
+        <Search category={params.category} search={query} page={page} />
 
-            <CardTitle className="text-3xl px-4">{movie.title}</CardTitle>
-
-            <CardDescription className="px-4  h-20 text-pretty text-ellipsis overflow-hidden">
-              {movie.overview}
-            </CardDescription>
-          </Card>
-        ))}
+        <Pagination className="flex justify-end mx-0 w-1/3">
+          <PaginationContent className="space-x-7">
+            <PaginationItem>
+              <PaginationPrevious
+                className={page === 1 ? "hidden" : ""}
+                href={
+                  query !== ""
+                    ? `${params.category}?query=${query}&page=${
+                        page > 1 ? page - 1 : 1
+                      }`
+                    : `${params.category}?page=${page > 1 ? page - 1 : 1}`
+                }
+              >
+                Previous
+              </PaginationPrevious>
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationNext
+                href={
+                  query !== ""
+                    ? `${params.category}?query=${query}&page=${page + 1}`
+                    : `${params.category}?page=${page + 1}`
+                }
+              >
+                Next
+              </PaginationNext>
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
+      <Suspense fallback={<Skeleton />}>
+        <Movies movies={data} />
+      </Suspense>
     </div>
   );
 };
